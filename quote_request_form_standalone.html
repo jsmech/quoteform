@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>Vehicle Transport Quote Request</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F1F4F7;
+  --surface:#FFFFFF;
+  --surface-2:#E7ECF0;
+  --ink:#101E2B;
+  --ink-soft:#5B6B79;
+  --navy:#1C3A5C;
+  --navy-deep:#122A44;
+  --amber:#9C6A12;
+  --amber-fill:#E8A93B;
+  --line:#D8E0E6;
+  --error:#B23A3A;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0C141C;
+    --surface:#121D28;
+    --surface-2:#182530;
+    --ink:#E7EEF3;
+    --ink-soft:#9FB4C4;
+    --navy:#7FA8CE;
+    --navy-deep:#16283A;
+    --amber:#E8B95E;
+    --amber-fill:#E8A93B;
+    --line:#26343F;
+    --error:#E98080;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0C141C;
+  --surface:#121D28;
+  --surface-2:#182530;
+  --ink:#E7EEF3;
+  --ink-soft:#9FB4C4;
+  --navy:#7FA8CE;
+  --navy-deep:#16283A;
+  --amber:#E8B95E;
+  --amber-fill:#E8A93B;
+  --line:#26343F;
+  --error:#E98080;
+}
+
+*{box-sizing:border-box;}
+html,body{background:var(--paper);}
+body{background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;margin:0;}
+h1,h2{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:0.02em;color:var(--ink);margin:0;text-wrap:balance;}
+label{font-size:13px;font-weight:500;color:var(--ink-soft);display:block;margin-bottom:4px;}
+input,textarea{
+  width:100%;font-family:'IBM Plex Sans',sans-serif;font-size:15px;color:var(--ink);
+  background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  padding:10px 12px;margin-bottom:14px;
+}
+input:focus,textarea:focus{outline:2px solid var(--navy);outline-offset:1px;}
+textarea{resize:vertical;min-height:70px;font-family:'IBM Plex Sans',sans-serif;}
+.page{max-width:520px;margin:0 auto;padding:1.75rem 1.25rem 3rem;}
+
+.masthead{display:flex;align-items:center;gap:12px;margin-bottom:1.75rem;}
+.badge{
+  width:44px;height:44px;border-radius:12px;background:var(--navy);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.badge svg{width:24px;height:24px;}
+.masthead h1{font-size:20px;}
+.masthead p{margin:2px 0 0;font-size:12.5px;color:var(--ink-soft);}
+
+.intro{font-size:14.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:1.5rem;}
+
+.card{background:var(--surface);border-radius:12px;border:0.5px solid var(--line);padding:16px;margin-bottom:14px;}
+.card-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.card-badge{
+  width:26px;height:26px;border-radius:7px;background:var(--surface-2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--navy);
+}
+.card-badge svg{width:15px;height:15px;}
+.card-head h2{font-size:14px;letter-spacing:0.03em;}
+
+.choice{display:flex;gap:8px;margin-bottom:14px;}
+.choice button{
+  flex:1;padding:9px;border-radius:8px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;
+  font-size:14px;font-weight:500;cursor:pointer;
+}
+.choice button.selected{background:var(--navy);border-color:var(--navy);color:#fff;}
+.choice-label{font-size:13px;font-weight:500;color:var(--ink-soft);margin-bottom:6px;}
+
+.error-text{font-size:12.5px;color:var(--error);margin:-10px 0 12px;display:none;}
+.error-text.show{display:block;}
+
+.submit-btn{
+  width:100%;padding:13px;border-radius:8px;border:none;
+  background:var(--navy);color:#fff;font-family:'Oswald',sans-serif;
+  font-size:14px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;
+  cursor:pointer;margin-top:6px;
+}
+.submit-btn:active{background:var(--navy-deep);}
+
+#result{display:none;}
+#result.show{display:block;}
+.result-card{background:var(--navy-deep);border-radius:12px;padding:16px;margin-top:1.5rem;}
+.result-card p{font-size:13.5px;color:#C7D6E3;line-height:1.6;margin:0 0 12px;}
+.result-card textarea{
+  width:100%;min-height:180px;font-family:ui-monospace,'SF Mono',Menlo,monospace;
+  font-size:12.5px;color:var(--ink);background:var(--surface);border:none;border-radius:8px;
+  padding:12px;margin-bottom:12px;resize:vertical;
+}
+.text-btn{
+  width:100%;padding:13px;border-radius:8px;border:none;
+  background:var(--amber-fill);color:#3A2A0A;font-family:'Oswald',sans-serif;
+  font-size:14.5px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
+}
+.text-btn svg{width:18px;height:18px;flex-shrink:0;}
+.or-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:#7E97AC;font-size:12px;}
+.or-divider::before,.or-divider::after{content:"";flex:1;height:1px;background:#2B4258;}
+.copy-btn{
+  width:100%;padding:11px;border-radius:8px;border:1px solid #2B4258;
+  background:transparent;color:#C7D6E3;font-family:'IBM Plex Sans',sans-serif;
+  font-size:13.5px;font-weight:500;cursor:pointer;
+}
+.copy-btn.copied{background:#7ED09A;color:#0F3A22;border-color:#7ED09A;}
+.copy-hint{font-size:12px;color:#9FB4C4;margin-top:8px;text-align:center;}
+
+.locate-btn{
+  width:100%;padding:10px;border-radius:8px;border:1px dashed var(--navy);
+  background:var(--surface-2);color:var(--navy);font-family:'IBM Plex Sans',sans-serif;
+  font-size:13.5px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:6px;
+}
+.locate-btn svg{width:15px;height:15px;flex-shrink:0;}
+.locate-btn:disabled{opacity:0.6;cursor:default;}
+.locate-hint{font-size:12px;color:var(--ink-soft);line-height:1.5;margin:0 0 14px;text-align:center;}
+.locate-hint.error{color:var(--error);}
+.locate-spin{animation:locate-spin 0.8s linear infinite;}
+@keyframes locate-spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="masthead">
+    <div class="badge">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+    </div>
+    <div>
+      <h1>Vehicle Transport Quote Request</h1>
+      <p>JS Mech Solutions — collection &amp; delivery</p>
+    </div>
+  </div>
+
+  <p class="intro">Fill this in and we'll get back to you with a price. When you're done, tap the button at the bottom to text us your details — no app or account needed.</p>
+
+  <form id="quoteForm" novalidate>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg></div>
+        <h2>Vehicle</h2>
+      </div>
+      <label for="vehicle">Make &amp; model</label>
+      <input id="vehicle" type="text" placeholder="Ford Fiesta" autocomplete="off">
+      <p class="error-text" id="vehicleError">Enter the vehicle's make and model</p>
+
+      <label for="reg">Registration <span style="font-weight:400;">(if you know it)</span></label>
+      <input id="reg" type="text" placeholder="AB12 CDE" autocomplete="off">
+
+      <p class="choice-label">Do the wheels turn freely?</p>
+      <div class="choice" data-group="wheels">
+        <button type="button" data-value="Yes" class="selected">Yes</button>
+        <button type="button" data-value="No">No</button>
+      </div>
+
+      <p class="choice-label">Does it start and drive?</p>
+      <div class="choice" data-group="drives">
+        <button type="button" data-value="Yes" class="selected">Yes</button>
+        <button type="button" data-value="No">No</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg></div>
+        <h2>Collection &amp; delivery</h2>
+      </div>
+      <label for="collectionPostcode">Collection postcode</label>
+      <input id="collectionPostcode" type="text" placeholder="M1 1AE" autocomplete="off" style="text-transform:uppercase;">
+
+      <button type="button" class="locate-btn" id="locateBtn">
+        <svg viewBox="0 0 24 24" fill="currentColor" id="locateIcon"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+        <span id="locateBtnText">Use my current location</span>
+      </button>
+      <p class="locate-hint" id="locateHint">Broken down and not sure of your postcode? We'll grab it from your phone.</p>
+
+      <label for="deliveryPostcode">Delivery postcode</label>
+      <input id="deliveryPostcode" type="text" placeholder="L1 8JQ" autocomplete="off" style="text-transform:uppercase; margin-bottom:0;">
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg></div>
+        <h2>Your details</h2>
+      </div>
+      <label for="name">Your name</label>
+      <input id="name" type="text" placeholder="Jane Smith" autocomplete="name">
+      <p class="error-text" id="nameError">Enter your name</p>
+
+      <label for="phone">Phone</label>
+      <input id="phone" type="tel" placeholder="07123 456789" autocomplete="tel">
+
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="jane@example.com" autocomplete="email">
+
+      <label for="address">Address <span style="font-weight:400;">(optional, for the paperwork)</span></label>
+      <input id="address" type="text" placeholder="12 High Street, Manchester" autocomplete="street-address" style="margin-bottom:0;">
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+        <h2>Anything else?</h2>
+      </div>
+      <label for="notes">Notes <span style="font-weight:400;">(optional)</span></label>
+      <textarea id="notes" placeholder="e.g. flat tyre, needs a flatbed, best time to collect..." style="margin-bottom:0;"></textarea>
+    </div>
+
+    <button type="submit" class="submit-btn">Generate my details</button>
+  </form>
+
+  <div class="result-card" id="result">
+    <p>Tap below to open your messages app with this ready to send to us.</p>
+    <textarea id="output" readonly></textarea>
+    <a class="text-btn" id="textBtn" href="#">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+      Text us this quote request
+    </a>
+    <div class="or-divider">OR</div>
+    <button class="copy-btn" id="copyBtn" type="button">Copy to clipboard instead</button>
+    <p class="copy-hint" id="copyHint">Prefer WhatsApp or email? Copy the text above and paste it in there.</p>
+  </div>
+</div>
+
+<script>
+document.getElementById('locateBtn').addEventListener('click', function() {
+  var btn = document.getElementById('locateBtn');
+  var btnText = document.getElementById('locateBtnText');
+  var icon = document.getElementById('locateIcon');
+  var hint = document.getElementById('locateHint');
+
+  if (!navigator.geolocation) {
+    hint.textContent = "Your phone can't share its location in this browser — enter the postcode manually.";
+    hint.classList.add('error');
+    return;
+  }
+
+  btn.disabled = true;
+  btnText.textContent = 'Finding you...';
+  icon.classList.add('locate-spin');
+  hint.classList.remove('error');
+  hint.textContent = 'Getting your location...';
+
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var lat = pos.coords.latitude;
+    var lon = pos.coords.longitude;
+    fetch('https://api.postcodes.io/postcodes?lon=' + lon + '&lat=' + lat + '&limit=1')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var result = data && data.result && data.result[0];
+        if (result && result.postcode) {
+          document.getElementById('collectionPostcode').value = result.postcode;
+          hint.textContent = 'Found it — ' + result.postcode + '. Not right? Just type over it.';
+        } else {
+          hint.textContent = "Couldn't match that to a postcode nearby — enter it manually.";
+          hint.classList.add('error');
+        }
+      })
+      .catch(function() {
+        hint.textContent = "Couldn't look up your postcode — enter it manually.";
+        hint.classList.add('error');
+      })
+      .finally(function() {
+        btn.disabled = false;
+        btnText.textContent = 'Use my current location';
+        icon.classList.remove('locate-spin');
+      });
+  }, function(err) {
+    btn.disabled = false;
+    btnText.textContent = 'Use my current location';
+    icon.classList.remove('locate-spin');
+    hint.classList.add('error');
+    if (err.code === err.PERMISSION_DENIED) {
+      hint.textContent = 'Location access was blocked — enter the postcode manually.';
+    } else {
+      hint.textContent = "Couldn't get your location — enter the postcode manually.";
+    }
+  }, { enableHighAccuracy: true, timeout: 10000 });
+});
+
+document.querySelectorAll('.choice').forEach(function(group) {
+  group.querySelectorAll('button').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      group.querySelectorAll('button').forEach(function(b) { b.classList.remove('selected'); });
+      btn.classList.add('selected');
+    });
+  });
+});
+
+function selectedValue(group) {
+  var el = document.querySelector('.choice[data-group="' + group + '"] button.selected');
+  return el ? el.getAttribute('data-value') : '';
+}
+
+document.getElementById('quoteForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  var vehicle = document.getElementById('vehicle').value.trim();
+  var name = document.getElementById('name').value.trim();
+  var vehicleOk = vehicle.length > 0;
+  var nameOk = name.length > 0;
+
+  document.getElementById('vehicleError').classList.toggle('show', !vehicleOk);
+  document.getElementById('nameError').classList.toggle('show', !nameOk);
+
+  if (!vehicleOk || !nameOk) return;
+
+  var lines = [
+    'VDMS Quote Request',
+    'Vehicle: ' + vehicle,
+    'Registration: ' + document.getElementById('reg').value.trim(),
+    'Wheels Roll: ' + selectedValue('wheels'),
+    'Drives: ' + selectedValue('drives'),
+    'Collection Postcode: ' + document.getElementById('collectionPostcode').value.trim(),
+    'Delivery Postcode: ' + document.getElementById('deliveryPostcode').value.trim(),
+    'Customer Name: ' + name,
+    'Phone: ' + document.getElementById('phone').value.trim(),
+    'Email: ' + document.getElementById('email').value.trim(),
+    'Address: ' + document.getElementById('address').value.trim(),
+    'Notes: ' + document.getElementById('notes').value.trim()
+  ];
+
+  var message = lines.join('\n');
+  document.getElementById('output').value = message;
+
+  var BUSINESS_NUMBER = '+447398637940';
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  var separator = isIOS ? '&' : '?';
+  document.getElementById('textBtn').setAttribute(
+    'href',
+    'sms:' + BUSINESS_NUMBER + separator + 'body=' + encodeURIComponent(message)
+  );
+
+  var result = document.getElementById('result');
+  result.classList.add('show');
+  result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+document.getElementById('copyBtn').addEventListener('click', function() {
+  var output = document.getElementById('output');
+  var btn = document.getElementById('copyBtn');
+  var hint = document.getElementById('copyHint');
+  function marksCopied() {
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    hint.textContent = 'Now paste it into WhatsApp, email, or a text to send to us.';
+    setTimeout(function() { btn.textContent = 'Copy to clipboard instead'; btn.classList.remove('copied'); }, 2500);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(output.value).then(marksCopied).catch(function() {
+      output.select();
+      document.execCommand('copy');
+      marksCopied();
+    });
+  } else {
+    output.select();
+    document.execCommand('copy');
+    marksCopied();
+  }
+});
+</script>
+</body>
+</html>
